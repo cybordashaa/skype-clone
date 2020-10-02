@@ -36,7 +36,7 @@ class FirebaseMethods {
         .where("email", isEqualTo: user.user.email)
         .get();
 
-    final List<DocumentSnapshot> docs = result.documents;
+    final List<DocumentSnapshot> docs = result.docs;
 
     //if user is registered then length of list > 0 or else less than 0
     return docs.length == 0 ? true : false;
