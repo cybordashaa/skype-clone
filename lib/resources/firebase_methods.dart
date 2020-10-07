@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/utils/utilities.dart';
 import '../models/user.dart';
 
@@ -9,6 +10,7 @@ class FirebaseMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   GoogleSignIn _googleSignIn = GoogleSignIn();
   static final CollectionReference  firestore = FirebaseFirestore.instance.collection('users');
+  static final CollectionReference firestoreMessage = FirebaseFirestore.instance.collection('messages');
 
   //user class
   UserModel user = UserModel();
@@ -83,5 +85,11 @@ class FirebaseMethods {
       }
     }
     return userList;
+  }
+
+  Future<void> addMessageToDb(Message message, UserModel sender, UserModel receiver) async{
+    var map = message.toMap();
+    await firestoreMessage.doc(message.senderId).collection(message.recieverId).add(map);
+    return await firestoreMessage.doc(message.recieverId).collection(message.senderId).add(map);
   }
 }
