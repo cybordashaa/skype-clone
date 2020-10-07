@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:skype_clone/resources/firebase_repository.dart';
 import 'package:skype_clone/screens/home_screen.dart';
 import 'package:skype_clone/screens/login_screen.dart';
+import 'package:skype_clone/screens/search_screen.dart';
 
 void main() async {
 
@@ -26,10 +27,18 @@ class _MyAppState extends State<MyApp> {
     // Firestore.instance.collection("users").document().setData({
     //   "name": 'Alex'
     // });
-    _repository.signOut();
+
+    // _repository.signOut();
     return MaterialApp(
       title: "Skype Clone",
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: {
+        '/search_screen': (context) => SearchScreen(),
+      },
+      theme: ThemeData(
+        brightness: Brightness.dark
+      ),
       home: FutureBuilder(
         future: _repository.getCurrentUser(),
         builder: (context, AsyncSnapshot<User> snapshot) {

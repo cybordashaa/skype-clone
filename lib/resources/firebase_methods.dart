@@ -24,16 +24,16 @@ class FirebaseMethods {
     GoogleSignInAuthentication _signInAuthentication =
     await _signInAccount.authentication;
 
-    final AuthCredential credential = GoogleAuthProvider.credential(
+    final GoogleAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: _signInAuthentication.accessToken,
         idToken: _signInAuthentication.idToken);
     final user = await FirebaseAuth.instance.signInWithCredential(credential);
     return user;
   }
 
-  Future<bool> authenticateUser(UserCredential user) async {
+  Future<bool> authenticateUser(User user) async {
     QuerySnapshot result = await firestore
-        .where("email", isEqualTo: user.user.email)
+        .where("email", isEqualTo: user.email)
         .get();
 
     final List<DocumentSnapshot> docs = result.docs;
@@ -42,24 +42,46 @@ class FirebaseMethods {
     return docs.length == 0 ? true : false;
   }
 
-  Future<void> addDataToDb(UserCredential currentUser) async {
-    String username = Utils.getUsername(currentUser.user.email);
+  Future<void> addDataToDb(User currentUser) async {
+    String username = Utils.getUsername(currentUser.email);
 
     user = UserModel(
-        uid: currentUser.user.uid,
-        email: currentUser.user.email,
-        name: currentUser.user.displayName,
-        profilePhoto: currentUser.user.photoUrl,
+        uid: currentUser.uid,
+        email: currentUser.email,
+        name: currentUser.displayName,
+        profilePhoto: currentUser.photoURL,
         username: username);
 
     firestore
-        .document(currentUser.user.uid)
-        .setData(user.toMap(user));
+        .doc(currentUser.uid)
+        .set(user.toMap(user));
   }
 
-  Future<void> signOut() async {
-    await _googleSignIn.disconnect();
-    await _googleSignIn.signOut();
-    return await _auth.signOut();
+  // Future<void> signOut() async {
+  //   await _googleSignIn.disconnect();
+  //   await _googleSignIn.signOut();
+  //   return await _auth.signOut();
+  // }
+
+
+  Future<bool> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+  Future<List<UserModel>> fetchAllUsers(User user) async{
+    List<UserModel> userList = List<UserModel>();
+
+    QuerySnapshot querySnapshot = await firestore.get();
+    for(var i = 0; i < querySnapshot.docs.length; i++){
+      if(querySnapshot.docs[i].id != user.uid){
+        userList.add(UserModel.fromMap(querySnapshot.docs[i].data()));
+      }
+    }
+    return userList;
   }
 }

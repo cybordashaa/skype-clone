@@ -13,16 +13,16 @@ class ChatListScreen extends StatefulWidget{
 final FirebaseRepository _repository = FirebaseRepository();
 class _ChatListScreenState extends State<ChatListScreen>{
   String currentUserId;
-  String initials;
+  String initials = "";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _repository.getCurrentUser().then((user) {
       setState(() {
+        print("--${user.displayName}");
         currentUserId = user.uid;
         initials  = Utils.getInitials(user.displayName);
-        print("--${initials}");
       });
     });
   }
@@ -43,7 +43,9 @@ class _ChatListScreenState extends State<ChatListScreen>{
             Icons.search,
             color: Colors.white,
           ),
-          onPressed: (){},
+          onPressed: (){
+            Navigator.pushNamed(context, '/search_screen');
+          },
         ),
         IconButton(
           icon: Icon(
@@ -131,12 +133,13 @@ class _ChatListContainerState extends State<ChatListContainer> {
     );
   }
 }
+class UserCircle extends StatefulWidget{
 
-class UserCircle extends StatelessWidget {
   final String text;
-
   UserCircle(this.text);
-
+  UserCircleState createState() => UserCircleState();
+}
+class UserCircleState extends State<UserCircle> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -151,7 +154,7 @@ class UserCircle extends StatelessWidget {
           Align(
             alignment: Alignment.center,
             child: Text(
-              text,
+              widget.text,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: UniversalVariables.lightBlueColor,
