@@ -5,11 +5,12 @@ class Message {
   String recieverId;
   String type;
   String message;
-  FieldValue timestamp;
+  Timestamp timestamp;
   String photoUrl;
 
   Message({this.senderId,this.recieverId, this.type, this.message, this.timestamp,this.photoUrl});
   // Will be only called when you wish to send an image
+  // named constructor
   Message.imageMessage({this.senderId, this.recieverId, this.message, this.type, this.timestamp, this.photoUrl});
 
   Map toMap(){
@@ -21,13 +22,14 @@ class Message {
     map['timestamp'] = this.timestamp;
     return map;
   }
-  Message fromMap(Map<String, dynamic> map){
-    Message _message = Message();
-    _message.senderId = map['senderId'];
-    _message.recieverId = map['recieverId'];
-    _message.type = map['type'];
-    _message.message = map['message'];
-    _message.timestamp = map['timestamp'];
-    return _message;
+
+  // member function
+  // named constructor
+  Message.fromMap(Map<String, dynamic> map) {
+    this.senderId = map['senderId'];
+    this.recieverId = map['recieverId'];
+    this.type = map['type'];
+    this.message = map['message'];
+    this.timestamp = map['timestamp'];
   }
 }

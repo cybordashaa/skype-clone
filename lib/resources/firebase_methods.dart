@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:skype_clone/constants/string.dart';
 import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/utils/utilities.dart';
 import '../models/user.dart';
@@ -9,8 +10,8 @@ import '../models/user.dart';
 class FirebaseMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   GoogleSignIn _googleSignIn = GoogleSignIn();
-  static final CollectionReference  firestore = FirebaseFirestore.instance.collection('users');
-  static final CollectionReference firestoreMessage = FirebaseFirestore.instance.collection('messages');
+  static final CollectionReference  firestore = FirebaseFirestore.instance.collection(USERS_COLLECTION);
+  static final CollectionReference firestoreMessage = FirebaseFirestore.instance.collection(MESSAGE_COLLECTION);
 
   //user class
   UserModel user = UserModel();
