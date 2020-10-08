@@ -1,9 +1,13 @@
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:skype_clone/constants/string.dart';
 import 'package:skype_clone/models/message.dart';
+import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'package:skype_clone/utils/utilities.dart';
 import '../models/user.dart';
 
@@ -12,6 +16,7 @@ class FirebaseMethods {
   GoogleSignIn _googleSignIn = GoogleSignIn();
   static final CollectionReference  firestore = FirebaseFirestore.instance.collection(USERS_COLLECTION);
   static final CollectionReference firestoreMessage = FirebaseFirestore.instance.collection(MESSAGE_COLLECTION);
+  StorageReference _storageReference;
 
   //user class
   UserModel user = UserModel();
@@ -88,9 +93,58 @@ class FirebaseMethods {
     return userList;
   }
 
-  Future<void> addMessageToDb(Message message, UserModel sender, UserModel receiver) async{
-    var map = message.toMap();
-    await firestoreMessage.doc(message.senderId).collection(message.recieverId).add(map);
-    return await firestoreMessage.doc(message.recieverId).collection(message.senderId).add(map);
+  Future<void> addMessageToDb(Message message, UserModel sender, UserModel receiver) async {
+    try {
+      var map = message.toMap();
+      await firestoreMessage.doc(message.senderId).collection(
+          message.recieverId).add(map);
+      return await firestoreMessage.doc(message.recieverId).collection(
+          message.senderId).add(map);
+    } catch(err){
+      print(err);
+      return null;
+    }
   }
+
+  // image upload to server function
+  Future<dynamic> uploadImageToStorage(File image) async{
+    _storageReference = FirebaseStorage.instance.ref().child('${DateTime.now().millisecondsSinceEpoch}');
+    StorageUploadTask _storageUploadTask  = _storageReference.putFile(image);
+    var url = (await _storageUploadTask.onComplete).ref.getDownloadURL();
+    print(url);
+    return url;
+  }
+  void setImageMsg(String url, String receiverId, String senderId) async{
+    Message _message;
+    _message = Message.imageMessage(
+      message: "IMAGE",
+      recieverId: receiverId,
+      senderId: senderId,
+      photoUrl: url,
+      timestamp: Timestamp.now(),
+      type: 'image'
+    );
+    var map  = _message.toMapImageMap();
+    // Set the data to database
+    await firestoreMessage.doc(_message.senderId).collection(
+        _message.recieverId).add(map);
+    await firestoreMessage.doc(_message.recieverId).collection(
+        _message.senderId).add(map);
+
+
+
+  }
+  // image upload function
+ void uploadImage(File image, String receiverId, String senderId, ImageUploadProvider imageUploadProvider) async {
+    // Set some loading value to db and show it to user
+   imageUploadProvider.setToLoading();
+
+   // Get url from the image bucket
+    String url = await uploadImageToStorage(image);
+
+    //Hide loading
+   imageUploadProvider.setToIdle();
+
+    setImageMsg(url, receiverId, senderId);
+ }
 }
