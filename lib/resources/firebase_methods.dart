@@ -27,6 +27,13 @@ class FirebaseMethods {
     return currentUser;
   }
 
+  Future<UserModel> getUserDetails() async {
+    User currentUser  = await getCurrentUser();
+   DocumentSnapshot documentSnapshot =  await firestore.doc(currentUser.uid).get();
+   return UserModel.fromMap(documentSnapshot.data());
+
+  }
+
   Future<UserCredential> signIn() async {
     GoogleSignInAccount _signInAccount = await _googleSignIn.signIn();
     GoogleSignInAuthentication _signInAuthentication =

@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
+import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/firebase_repository.dart';
 import 'package:skype_clone/screens/home_screen.dart';
 import 'package:skype_clone/screens/login_screen.dart';
@@ -33,8 +34,11 @@ class _MyAppState extends State<MyApp> {
 
     // _repository.signOut();
     // MultiProvider
-    return ChangeNotifierProvider<ImageUploadProvider>(
-      create: (context) => ImageUploadProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create:(_) => ImageUploadProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider())
+      ],
       child: MaterialApp(
         title: "Skype Clone",
         debugShowCheckedModeBanner: false,
